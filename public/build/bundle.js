@@ -24260,7 +24260,7 @@
 	          'section',
 	          null,
 	          'Promise in progress ... ',
-	          React.createElement('img', { src: '/public/images/loader.gif', title: 'Waiting for response' })
+	          React.createElement('img', { src: 'public/images/loader.gif', title: 'Waiting for response' })
 	        );
 	      } else if (this.state.isSuccess) {
 	        promiseSection = React.createElement(
@@ -25241,7 +25241,7 @@
 	      message = React.createElement(
 	        'section',
 	        null,
-	        React.createElement('img', { src: '/public/images/loader.gif', title: 'Waiting for response' }),
+	        React.createElement('img', { src: 'public/images/loader.gif', title: 'Waiting for response' }),
 	        this.state.message
 	      );
 	    }
