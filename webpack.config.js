@@ -1,7 +1,7 @@
 var webpack = require('webpack');
 module.exports = {
     entry: [
-      "./public/source/bootstrapper.jsx"
+      "./source/bootstrapper.jsx"
     ],
     output: {
         path: __dirname + '/public/build',

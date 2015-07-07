@@ -23710,7 +23710,7 @@
 
 	  render: function render() {
 	    var identifier = this.state.identifier || 'HOME';
-	    var title = '' + identifier + ' - Javascript Inspector';
+	    var title = identifier + ' - Javascript Inspector';
 	    return _react2['default'].createElement(
 	      _reactDocumentTitle2['default'],
 	      { title: title },
