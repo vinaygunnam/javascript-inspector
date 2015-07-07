@@ -37,7 +37,7 @@ var Home = React.createClass({
     }
 
     return (
-      <DocumentTitle title={'Local script - Javascript Inspector'}>
+      <DocumentTitle title={'Home - Javascript Inspector'}>
         <div className="app">
           <TopHeader disableSearch={true}/>
           <Sidebar />
