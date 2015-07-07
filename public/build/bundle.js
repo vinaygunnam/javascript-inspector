@@ -24951,7 +24951,7 @@
 
 	    return _react2['default'].createElement(
 	      _reactDocumentTitle2['default'],
-	      { title: 'Local script - Javascript Inspector' },
+	      { title: 'Home - Javascript Inspector' },
 	      _react2['default'].createElement(
 	        'div',
 	        { className: 'app' },
