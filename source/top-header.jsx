@@ -27,7 +27,7 @@ var TopHeader = React.createClass({
         <a className="home-link" />
         <a className="menu-link" />
         <h1 className="logo">
-          <a href="/" className="nav-link" title="Javascript Inspector">Javascript Inspector</a>
+          <a href="//vinaygunnam.github.io/javascript-inspector" className="nav-link" title="Javascript Inspector">Javascript Inspector</a>
         </h1>
       </header>
     );
