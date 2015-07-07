@@ -80,7 +80,7 @@ var Downloader = React.createClass({
 
     if (this.state.message) {
       message = <section>
-        <img src="/images/loader.gif" title="Waiting for response" />
+        <img src="/public/images/loader.gif" title="Waiting for response" />
         {this.state.message}
       </section>;
     }

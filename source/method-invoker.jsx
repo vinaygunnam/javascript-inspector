@@ -44,7 +44,7 @@ var MethodInvoker = React.createClass({
     if (index > -1 && index < argumentCollection.length) {
       argumentCollection.splice(index, 1);
       this.setState({
-        arguments: argumentCollection 
+        arguments: argumentCollection
       });
     }
   },
@@ -127,7 +127,7 @@ var MethodInvoker = React.createClass({
 
     if (this.state.isPromise) {
       if (this.state.isLoading) {
-        promiseSection = <section>Promise in progress ... <img src="/images/loader.gif" title="Waiting for response" /></section>
+        promiseSection = <section>Promise in progress ... <img src="/public/images/loader.gif" title="Waiting for response" /></section>
       } else if (this.state.isSuccess) {
         promiseSection = <section>Promise has been resolved.</section>;
       } else {
