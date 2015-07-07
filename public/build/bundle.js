@@ -24034,7 +24034,7 @@
 	        { className: "logo" },
 	        React.createElement(
 	          "a",
-	          { href: "/", className: "nav-link", title: "Javascript Inspector" },
+	          { href: "//vinaygunnam.github.io/javascript-inspector", className: "nav-link", title: "Javascript Inspector" },
 	          "Javascript Inspector"
 	        )
 	      )
