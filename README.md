@@ -11,3 +11,5 @@ Inspect javascript objects and libraries. Find the tool running [here](http://vi
 * Unlimited nested inspection (inspect child and/or nested properties)
 * Context aware method invocation
 * Specify context of choice for callback invocation
+* Supports constructor invocation
+* Inspect results from invoking methods
