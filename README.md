@@ -1,5 +1,5 @@
 # javascript-inspector
-Inspect javascript objects and libraries.
+Inspect javascript objects and libraries. Find the tool running [here](http://vinaygunnam.github.io/javascript-inspector).
 
 ### Features
 * Inspect ANY script - internal, external, remote or local machine

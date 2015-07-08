@@ -80,7 +80,7 @@ var MethodInvoker = React.createClass({
       };
 
       if ((result.success && typeof result.success === 'function')
-            || (result.error && typeof result.error === 'function')) {
+            && (result.error && typeof result.error === 'function')) {
         isPromise = true;
         isLoading = true;
 
