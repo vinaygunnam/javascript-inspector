@@ -65,6 +65,11 @@ var App = React.createClass({
               }
             }
           }
+
+          if (typeof object === 'function' && object.prototype
+              && typeof object.prototype.constructor === 'function') {
+            inspectionPool.constructorFn = object.prototype.constructor;
+          }
           error = null;
         } else {
           error = 'Not eligible for inspection. Must be an object or a function.';

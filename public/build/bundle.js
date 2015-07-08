@@ -67,11 +67,11 @@
 
 	var _appJsx2 = _interopRequireDefault(_appJsx);
 
-	var _pathJsx = __webpack_require__(209);
+	var _pathJsx = __webpack_require__(210);
 
 	var _pathJsx2 = _interopRequireDefault(_pathJsx);
 
-	var _homeJsx = __webpack_require__(210);
+	var _homeJsx = __webpack_require__(211);
 
 	var _homeJsx2 = _interopRequireDefault(_homeJsx);
 
@@ -23600,7 +23600,7 @@
 
 	var _stageJsx2 = _interopRequireDefault(_stageJsx);
 
-	var _helpersCleanAndParse = __webpack_require__(208);
+	var _helpersCleanAndParse = __webpack_require__(209);
 
 	var _helpersCleanAndParse2 = _interopRequireDefault(_helpersCleanAndParse);
 
@@ -23667,6 +23667,10 @@
 	                inspectionPool.properties[key] = object[key];
 	              }
 	            }
+	          }
+
+	          if (typeof object === 'function' && object.prototype && typeof object.prototype.constructor === 'function') {
+	            inspectionPool.constructorFn = object.prototype.constructor;
 	          }
 	          error = null;
 	        } else {
@@ -24075,11 +24079,11 @@
 
 	var _methodInvokerJsx2 = _interopRequireDefault(_methodInvokerJsx);
 
-	var _propertyInfoJsx = __webpack_require__(207);
+	var _propertyInfoJsx = __webpack_require__(208);
 
 	var _propertyInfoJsx2 = _interopRequireDefault(_propertyInfoJsx);
 
-	var _helpersCleanAndParse = __webpack_require__(208);
+	var _helpersCleanAndParse = __webpack_require__(209);
 
 	var _helpersCleanAndParse2 = _interopRequireDefault(_helpersCleanAndParse);
 
@@ -24138,10 +24142,18 @@
 
 	var _argumentJsx2 = _interopRequireDefault(_argumentJsx);
 
+	var _helpersInspectorCache = __webpack_require__(207);
+
+	var _helpersInspectorCache2 = _interopRequireDefault(_helpersInspectorCache);
+
+	var _reactRouter = __webpack_require__(158);
+
 	var React = __webpack_require__(2);
 
 	var MethodInvoker = React.createClass({
 	  displayName: 'MethodInvoker',
+
+	  mixins: [_reactRouter.Navigation],
 
 	  getInitialState: function getInitialState() {
 	    return {
@@ -24205,6 +24217,7 @@
 	      var successFn = function successFn(response) {
 	        result = response;
 	        isLoading = !(isSuccess = true);
+	        _helpersInspectorCache2['default'].storeResult(result);
 	        _this.setState({
 	          isPromise: isPromise,
 	          isSuccess: isSuccess,
@@ -24216,6 +24229,7 @@
 	      var errorFn = function errorFn(response) {
 	        result = response;
 	        isLoading = false;
+	        _helpersInspectorCache2['default'].storeResult(result);
 	        _this.setState({
 	          isPromise: isPromise,
 	          isSuccess: isSuccess,
@@ -24224,7 +24238,7 @@
 	        });
 	      };
 
-	      if (result.success && typeof result.success === 'function' || result.error && typeof result.error === 'function') {
+	      if (result.success && typeof result.success === 'function' && (result.error && typeof result.error === 'function')) {
 	        isPromise = true;
 	        isLoading = true;
 
@@ -24242,6 +24256,7 @@
 	      }
 	    }
 
+	    _helpersInspectorCache2['default'].storeResult(result);
 	    this.setState({
 	      isPromise: isPromise,
 	      isSuccess: isSuccess,
@@ -24256,6 +24271,10 @@
 
 	  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	    Prism.highlightAll();
+	  },
+
+	  inspectResult: function inspectResult() {
+	    this.transitionTo('app', { identifier: 'inspector->result' });
 	  },
 
 	  render: function render() {
@@ -24295,6 +24314,19 @@
 	      }
 	    }
 
+	    var inspectResult = React.createElement(
+	      'span',
+	      { className: 'action' },
+	      '(Nothing to inspect)'
+	    );
+	    if (this.state.result) {
+	      inspectResult = React.createElement(
+	        'button',
+	        { className: 'action', onClick: this.inspectResult },
+	        'Inspect'
+	      );
+	    }
+
 	    return React.createElement(
 	      'div',
 	      null,
@@ -24330,7 +24362,8 @@
 	        React.createElement(
 	          'h2',
 	          { className: 'first-heading' },
-	          'Result'
+	          'Result',
+	          inspectResult
 	        ),
 	        promiseSection,
 	        React.createElement(
@@ -24621,9 +24654,17 @@
 
 /***/ },
 /* 206 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+
+	function _interopRequireDefault(obj) {
+	  return obj && obj.__esModule ? obj : { 'default': obj };
+	}
+
+	var _inspectorCache = __webpack_require__(207);
+
+	var _inspectorCache2 = _interopRequireDefault(_inspectorCache);
 
 	function validateType(argumentText, argType, contextType, methodContext) {
 	  var isValid = true,
@@ -24667,14 +24708,12 @@
 	      break;
 	    case 'Function':
 	      try {
-	        window.inspectorFns = window.inspectorFns || {};
-
 	        var fnName = generateUniqueName();
 	        if (argumentText && validateFnExpression(argumentText)) {
-	          eval('window.inspectorFns.' + fnName + ' = eval(' + argumentText + ')');
+	          _inspectorCache2['default'].storeCallback(fnName, eval(argumentText));
 	        } else {
 	          text = 'function optional_name(/* arguments */) { /* body */ }';
-	          eval('window.inspectorFns.' + fnName + ' = eval(' + text + ')');
+	          _inspectorCache2['default'].storeCallback(fnName, eval(text));
 	        }
 
 	        switch (contextType) {
@@ -24748,6 +24787,32 @@
 
 /***/ },
 /* 207 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	function storeCallback(name, callback) {
+	  prepareWorkspace();
+	  window.inspector.fns[name] = callback;
+	}
+
+	function storeResult(result) {
+	  prepareWorkspace();
+	  window.inspector.result = result;
+	}
+
+	function prepareWorkspace() {
+	  window.inspector = window.inspector || {};
+	  window.inspector.fns = window.inspector.fns || {};
+	}
+
+	module.exports = {
+	  storeCallback: storeCallback,
+	  storeResult: storeResult
+	};
+
+/***/ },
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24832,7 +24897,7 @@
 	module.exports = PropertyInfo;
 
 /***/ },
-/* 208 */
+/* 209 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24877,7 +24942,7 @@
 	module.exports = cleanAndParse;
 
 /***/ },
-/* 209 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24901,7 +24966,7 @@
 	module.exports = Path;
 
 /***/ },
-/* 210 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24924,15 +24989,15 @@
 
 	var _sidebarJsx2 = _interopRequireDefault(_sidebarJsx);
 
-	var _inspectionRequestJsx = __webpack_require__(211);
+	var _inspectionRequestJsx = __webpack_require__(212);
 
 	var _inspectionRequestJsx2 = _interopRequireDefault(_inspectionRequestJsx);
 
-	var _uploaderJsx = __webpack_require__(212);
+	var _uploaderJsx = __webpack_require__(213);
 
 	var _uploaderJsx2 = _interopRequireDefault(_uploaderJsx);
 
-	var _downloaderJsx = __webpack_require__(213);
+	var _downloaderJsx = __webpack_require__(214);
 
 	var _downloaderJsx2 = _interopRequireDefault(_downloaderJsx);
 
@@ -25027,7 +25092,7 @@
 	module.exports = Home;
 
 /***/ },
-/* 211 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -25067,14 +25132,14 @@
 	module.exports = InspectionRequest;
 
 /***/ },
-/* 212 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _inspectionRequestJsx = __webpack_require__(211);
+	var _inspectionRequestJsx = __webpack_require__(212);
 
 	var _inspectionRequestJsx2 = _interopRequireDefault(_inspectionRequestJsx);
 
@@ -25163,18 +25228,18 @@
 	module.exports = Uploader;
 
 /***/ },
-/* 213 */
+/* 214 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _inspectionRequestJsx = __webpack_require__(211);
+	var _inspectionRequestJsx = __webpack_require__(212);
 
 	var _inspectionRequestJsx2 = _interopRequireDefault(_inspectionRequestJsx);
 
-	var _helpersScriptLoader = __webpack_require__(214);
+	var _helpersScriptLoader = __webpack_require__(215);
 
 	var _helpersScriptLoader2 = _interopRequireDefault(_helpersScriptLoader);
 
@@ -25274,7 +25339,7 @@
 	module.exports = Downloader;
 
 /***/ },
-/* 214 */
+/* 215 */
 /***/ function(module, exports) {
 
 	// https://css-tricks.com/snippets/javascript/async-script-loader-with-callback/

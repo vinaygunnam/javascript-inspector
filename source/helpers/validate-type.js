@@ -1,3 +1,5 @@
+import InspectorCache from './inspector-cache';
+
 function validateType(argumentText, argType, contextType, methodContext) {
   let isValid = true,
     text = argumentText,
@@ -42,14 +44,12 @@ function validateType(argumentText, argType, contextType, methodContext) {
       break;
     case 'Function':
       try {
-        window.inspectorFns = window.inspectorFns || {};
-
         var fnName = generateUniqueName();
         if (argumentText && validateFnExpression(argumentText)) {
-          eval(`window.inspectorFns.${fnName} = eval(${argumentText})`);
+          InspectorCache.storeCallback(fnName, eval(argumentText));
         } else {
           text = 'function optional_name(/* arguments */) { /* body */ }';
-          eval(`window.inspectorFns.${fnName} = eval(${text})`);
+          InspectorCache.storeCallback(fnName, eval(text));
         }
 
         switch (contextType) {

@@ -1,7 +1,11 @@
 var React = require('react');
 import Argument from './argument.jsx';
+import InspectorCache from './helpers/inspector-cache';
+import {Navigation} from 'react-router';
 
 var MethodInvoker = React.createClass({
+  mixins: [Navigation],
+
   getInitialState: function getInitialState() {
     return {
       arguments: [],
@@ -60,6 +64,7 @@ var MethodInvoker = React.createClass({
       let successFn = (response) => {
         result = response;
         isLoading = !(isSuccess = true);
+        InspectorCache.storeResult(result);
         this.setState({
           isPromise,
           isSuccess,
@@ -71,6 +76,7 @@ var MethodInvoker = React.createClass({
       let errorFn = (response) => {
         result = response;
         isLoading = false;
+        InspectorCache.storeResult(result);
         this.setState({
           isPromise,
           isSuccess,
@@ -98,6 +104,7 @@ var MethodInvoker = React.createClass({
       }
     }
 
+    InspectorCache.storeResult(result);
     this.setState({
       isPromise,
       isSuccess,
@@ -112,6 +119,10 @@ var MethodInvoker = React.createClass({
 
   componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
     Prism.highlightAll();
+  },
+
+  inspectResult: function inspectResult() {
+    this.transitionTo('app', { identifier: 'inspector->result' });
   },
 
   render: function() {
@@ -135,6 +146,11 @@ var MethodInvoker = React.createClass({
       }
     }
 
+    let inspectResult = <span className="action">(Nothing to inspect)</span>;
+    if (this.state.result) {
+      inspectResult = <button className="action" onClick={this.inspectResult}>Inspect</button>;
+    }
+    
     return (
       <div>
         <p className="links"></p>
@@ -150,7 +166,10 @@ var MethodInvoker = React.createClass({
           {args}
         </div>
         <div className="argument-container">
-          <h2 className="first-heading">Result</h2>
+          <h2 className="first-heading">
+            Result
+            {inspectResult}
+          </h2>
           {promiseSection}
           <pre><code className="language-javascript">{this.state.result}</code></pre>
         </div>
