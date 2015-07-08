@@ -1,4 +1,5 @@
 var React = require('react');
+import { Link } from 'react-router';
 
 var TopHeader = React.createClass({
   onInput: function onInput(evt) {
@@ -12,23 +13,29 @@ var TopHeader = React.createClass({
 
     if (!this.props.disableSearch) {
       searchForm = <form className="search">
-        <input type="search" className="search-input" placeholder="Search…"
-          autocomplete="off" autocapitalize="off" autocorrect="off"
-          value={this.props.filterText}
-          spellcheck="false" maxlength={20} onChange={this.onInput} />
-        <a className="search-clear" />
-        <div className="search-tag" />
-      </form>;
+          <input autocapitalize="off" autocomplete="off" autocorrect="off"
+            className="search-input" maxlength={20} onChange={this.onInput}
+            placeholder="Search…" spellcheck="false" type="search"
+            value={this.props.filterText}/>
+          <a className="search-clear"/>
+          <div className="search-tag"/>
+        </form>;
     }
 
     return (
       <header className="header">
         {searchForm}
-        <a className="home-link" />
-        <a className="menu-link" />
+        <a className="home-link"/>
+        <a className="menu-link"/>
         <h1 className="logo">
-          <a href="//vinaygunnam.github.io/javascript-inspector" className="nav-link" title="Javascript Inspector">Javascript Inspector</a>
+          <a className="nav-link" title="Javascript Inspector"
+            href="//vinaygunnam.github.io/javascript-inspector">Javascript Inspector</a>
         </h1>
+        <nav className="nav">
+          <a className="nav-link" href="about.html">About</a>
+          <a className="nav-link" target="_blank"
+            href="https://github.com/vinaygunnam/javascript-inspector">Source</a>
+        </nav>
       </header>
     );
   }

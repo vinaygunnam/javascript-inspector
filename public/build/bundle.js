@@ -23994,12 +23994,14 @@
 /* 202 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
+
+	var _reactRouter = __webpack_require__(158);
 
 	var React = __webpack_require__(2);
 
 	var TopHeader = React.createClass({
-	  displayName: "TopHeader",
+	  displayName: 'TopHeader',
 
 	  onInput: function onInput(evt) {
 	    if (this.props.search) {
@@ -24012,30 +24014,46 @@
 
 	    if (!this.props.disableSearch) {
 	      searchForm = React.createElement(
-	        "form",
-	        { className: "search" },
-	        React.createElement("input", { type: "search", className: "search-input", placeholder: "Search…",
-	          autocomplete: "off", autocapitalize: "off", autocorrect: "off",
-	          value: this.props.filterText,
-	          spellcheck: "false", maxlength: 20, onChange: this.onInput }),
-	        React.createElement("a", { className: "search-clear" }),
-	        React.createElement("div", { className: "search-tag" })
+	        'form',
+	        { className: 'search' },
+	        React.createElement('input', { autocapitalize: 'off', autocomplete: 'off', autocorrect: 'off',
+	          className: 'search-input', maxlength: 20, onChange: this.onInput,
+	          placeholder: 'Search…', spellcheck: 'false', type: 'search',
+	          value: this.props.filterText }),
+	        React.createElement('a', { className: 'search-clear' }),
+	        React.createElement('div', { className: 'search-tag' })
 	      );
 	    }
 
 	    return React.createElement(
-	      "header",
-	      { className: "header" },
+	      'header',
+	      { className: 'header' },
 	      searchForm,
-	      React.createElement("a", { className: "home-link" }),
-	      React.createElement("a", { className: "menu-link" }),
+	      React.createElement('a', { className: 'home-link' }),
+	      React.createElement('a', { className: 'menu-link' }),
 	      React.createElement(
-	        "h1",
-	        { className: "logo" },
+	        'h1',
+	        { className: 'logo' },
 	        React.createElement(
-	          "a",
-	          { href: "//vinaygunnam.github.io/javascript-inspector", className: "nav-link", title: "Javascript Inspector" },
-	          "Javascript Inspector"
+	          'a',
+	          { className: 'nav-link', title: 'Javascript Inspector',
+	            href: '//vinaygunnam.github.io/javascript-inspector' },
+	          'Javascript Inspector'
+	        )
+	      ),
+	      React.createElement(
+	        'nav',
+	        { className: 'nav' },
+	        React.createElement(
+	          'a',
+	          { className: 'nav-link', href: 'about.html' },
+	          'About'
+	        ),
+	        React.createElement(
+	          'a',
+	          { className: 'nav-link', target: '_blank',
+	            href: 'https://github.com/vinaygunnam/javascript-inspector' },
+	          'Source'
 	        )
 	      )
 	    );
@@ -25156,6 +25174,10 @@
 
 	var _inspectionRequestJsx2 = _interopRequireDefault(_inspectionRequestJsx);
 
+	var _helpersScriptLoader = __webpack_require__(214);
+
+	var _helpersScriptLoader2 = _interopRequireDefault(_helpersScriptLoader);
+
 	var React = __webpack_require__(2);
 
 	var Downloader = React.createClass({
@@ -25176,58 +25198,19 @@
 	    if (this.refs.url) {
 	      var urlInput = React.findDOMNode(this.refs.url).value;
 	      if (urlInput) {
-	        var req = new XMLHttpRequest();
-	        req.addEventListener('progress', function (evt) {
-	          var message = null;
-	          if (evt.lengthComputable) {
-	            var percentComplete = evt.loaded / evt.total;
-	            message = 'Downloading ... ' + percentComplete + '%';
-	          } else {
-	            message = 'Downloading ... ';
-	          }
-
+	        var loader = new _helpersScriptLoader2['default']();
+	        loader.require([urlInput], function () {
 	          _this.setState({
-	            message: message,
-	            ready: false,
-	            error: null
-	          });
-	        });
-
-	        req.addEventListener('load', function (evt) {
-	          try {
-	            eval(req.responseText);
-	            _this.setState({
-	              ready: true,
-	              error: null,
-	              message: null
-	            });
-	          } catch (e) {
-	            _this.setState({
-	              ready: true,
-	              error: 'An error occurred while processing the file.',
-	              message: null
-	            });
-	          } finally {}
-	        });
-
-	        req.addEventListener('error', function (evt) {
-	          _this.setState({
-	            error: 'An error occurred while downloading the file.',
-	            ready: false,
+	            ready: true,
+	            error: null,
 	            message: null
 	          });
 	        });
-
-	        req.addEventListener('abort', function (evt) {
-	          _this.setState({
-	            error: 'Download request is aborted. Check your network and try again.',
-	            ready: false,
-	            message: null
-	          });
+	        this.setState({
+	          message: 'Downloading ... ',
+	          ready: false,
+	          error: null
 	        });
-
-	        req.open('GET', urlInput, true);
-	        req.send();
 	      }
 	    }
 	  },
@@ -25289,6 +25272,45 @@
 	});
 
 	module.exports = Downloader;
+
+/***/ },
+/* 214 */
+/***/ function(module, exports) {
+
+	// https://css-tricks.com/snippets/javascript/async-script-loader-with-callback/
+	'use strict';
+
+	var ScriptLoader = function ScriptLoader() {};
+	ScriptLoader.prototype = {
+	    require: function require(scripts, callback) {
+	        this.loadCount = 0;
+	        this.totalRequired = scripts.length;
+	        this.callback = callback;
+
+	        for (var i = 0; i < scripts.length; i++) {
+	            this.writeScript(scripts[i]);
+	        }
+	    },
+	    loaded: function loaded(evt) {
+	        this.loadCount++;
+
+	        if (this.loadCount == this.totalRequired && typeof this.callback == 'function') this.callback.call();
+	    },
+	    writeScript: function writeScript(src) {
+	        var self = this;
+	        var s = document.createElement('script');
+	        s.type = 'text/javascript';
+	        s.async = true;
+	        s.src = src;
+	        s.addEventListener('load', function (e) {
+	            self.loaded(e);
+	        }, false);
+	        var head = document.getElementsByTagName('head')[0];
+	        head.appendChild(s);
+	    }
+	};
+
+	module.exports = ScriptLoader;
 
 /***/ }
 /******/ ]);

@@ -1,5 +1,6 @@
 var React = require('react');
 import InspectionRequest from './inspection-request.jsx';
+import ScriptLoader from './helpers/script-loader';
 
 var Downloader = React.createClass({
   getInitialState: function getInitialState() {
@@ -15,60 +16,19 @@ var Downloader = React.createClass({
     if (this.refs.url) {
       let urlInput = React.findDOMNode(this.refs.url).value;
       if (urlInput) {
-        var req = new XMLHttpRequest();
-        req.addEventListener('progress', (evt) => {
-          let message = null;
-          if (evt.lengthComputable) {
-            var percentComplete = evt.loaded / evt.total;
-            message = `Downloading ... ${percentComplete}%`;
-          } else {
-            message = `Downloading ... `;
-          }
-
+        var loader = new ScriptLoader();
+        loader.require([urlInput], () => {
           this.setState({
-            message,
-            ready: false,
-            error: null
-          });
-        });
-
-        req.addEventListener('load', (evt) => {
-          try {
-            eval(req.responseText);
-            this.setState({
-              ready: true,
-              error: null,
-              message: null
-            });
-          } catch (e) {
-            this.setState({
-              ready: true,
-              error: 'An error occurred while processing the file.',
-              message: null
-            });
-          } finally {
-
-          }
-        });
-
-        req.addEventListener('error', (evt) => {
-          this.setState({
-            error: 'An error occurred while downloading the file.',
-            ready: false,
+            ready: true,
+            error: null,
             message: null
           });
         });
-
-        req.addEventListener('abort', (evt) => {
-          this.setState({
-            error: 'Download request is aborted. Check your network and try again.',
-            ready: false,
-            message: null
-          });
+        this.setState({
+          message: 'Downloading ... ',
+          ready: false,
+          error: null
         });
-
-        req.open('GET', urlInput, true);
-        req.send();
       }
     }
   },
