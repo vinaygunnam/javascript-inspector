@@ -24232,24 +24232,26 @@
 	      var successFn = function successFn(response) {
 	        result = response;
 	        isLoading = !(isSuccess = true);
-	        _helpersInspectorCache2['default'].storeResult(result);
+	        var resultIdentifier = _helpersInspectorCache2['default'].storeResult(result);
 	        _this.setState({
 	          isPromise: isPromise,
 	          isSuccess: isSuccess,
 	          isLoading: isLoading,
-	          result: JSON.stringify(result, null, 4)
+	          result: JSON.stringify(result, null, 4),
+	          resultIdentifier: resultIdentifier
 	        });
 	      };
 
 	      var errorFn = function errorFn(response) {
 	        result = response;
 	        isLoading = false;
-	        _helpersInspectorCache2['default'].storeResult(result);
+	        var resultIdentifier = _helpersInspectorCache2['default'].storeResult(result);
 	        _this.setState({
 	          isPromise: isPromise,
 	          isSuccess: isSuccess,
 	          isLoading: isLoading,
-	          result: JSON.stringify(result, null, 4)
+	          result: JSON.stringify(result, null, 4),
+	          resultIdentifier: resultIdentifier
 	        });
 	      };
 
@@ -24271,12 +24273,13 @@
 	      }
 	    }
 
-	    _helpersInspectorCache2['default'].storeResult(result);
+	    var resultIdentifier = _helpersInspectorCache2['default'].storeResult(result);
 	    this.setState({
 	      isPromise: isPromise,
 	      isSuccess: isSuccess,
 	      isLoading: isLoading,
-	      result: JSON.stringify(result, null, 4)
+	      result: JSON.stringify(result, null, 4),
+	      resultIdentifier: resultIdentifier
 	    });
 	  },
 
@@ -24289,7 +24292,7 @@
 	  },
 
 	  inspectResult: function inspectResult() {
-	    this.transitionTo('app', { identifier: 'inspector->result' });
+	    this.transitionTo('app', { identifier: 'inspector->results->' + this.state.resultIdentifier });
 	  },
 
 	  render: function render() {
@@ -24334,7 +24337,7 @@
 	      { className: 'action' },
 	      '(Nothing to inspect)'
 	    );
-	    if (this.state.result) {
+	    if (this.state.result && !this.state.isLoading) {
 	      inspectResult = React.createElement(
 	        'button',
 	        { className: 'action', onClick: this.inspectResult },
@@ -24723,28 +24726,28 @@
 	      break;
 	    case 'Function':
 	      try {
-	        var fnName = generateUniqueName();
+	        var fName = undefined;
 	        if (argumentText && validateFnExpression(argumentText)) {
-	          _inspectorCache2['default'].storeCallback(fnName, eval(argumentText));
+	          fName = _inspectorCache2['default'].storeCallback(eval(argumentText));
 	        } else {
 	          text = 'function optional_name(/* arguments */) { /* body */ }';
-	          _inspectorCache2['default'].storeCallback(fnName, eval(text));
+	          fName = _inspectorCache2['default'].storeCallback(eval(text));
 	        }
 
 	        switch (contextType) {
 	          case 'method':
-	            window.inspectorFns[fnName] = window.inspectorFns[fnName].bind(methodContext);
+	            window.inspector.fns[fnName] = window.inspector.fns[fnName].bind(methodContext);
 	            break;
 	          case 'window':
-	            window.inspectorFns[fnName] = window.inspectorFns[fnName].bind(window);
+	            window.inspector.fns[fnName] = window.inspector.fns[fnName].bind(window);
 	            break;
 	          case 'null':
 	          default:
-	            window.inspectorFns[fnName] = window.inspectorFns[fnName].bind(null);
+	            window.inspector.fns[fnName] = window.inspector.fns[fnName].bind(null);
 	            break;
 	        }
 
-	        value = window.inspectorFns[fnName];
+	        value = window.inspector.fns[fnName];
 	        isValid = true;
 	      } catch (e) {
 	        isValid = false;
@@ -24793,32 +24796,37 @@
 	  }
 	}
 
-	function generateUniqueName() {
-	  var now = new Date();
-	  return now.toString().replace(/[\s:\-\(\)]/gm, '');
-	}
-
 	module.exports = validateType;
 
 /***/ },
 /* 207 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
-	function storeCallback(name, callback) {
+	function storeCallback(callback) {
 	  prepareWorkspace();
+	  var name = generateUniqueName();
 	  window.inspector.fns[name] = callback;
+	  return name;
 	}
 
 	function storeResult(result) {
 	  prepareWorkspace();
-	  window.inspector.result = result;
+	  var name = generateUniqueName();
+	  window.inspector.results[name] = result;
+	  return name;
 	}
 
 	function prepareWorkspace() {
 	  window.inspector = window.inspector || {};
 	  window.inspector.fns = window.inspector.fns || {};
+	  window.inspector.results = window.inspector.results || {};
+	}
+
+	function generateUniqueName() {
+	  var now = new Date();
+	  return now.toString().replace(/[\s:\-\(\)]/gm, '');
 	}
 
 	module.exports = {

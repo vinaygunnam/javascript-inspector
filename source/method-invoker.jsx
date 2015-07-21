@@ -62,7 +62,7 @@ var MethodInvoker = React.createClass({
 
       return new F(args);
     }
-    
+
     //return new (Function.prototype.bind.apply(target, args));
   },
 
@@ -79,24 +79,26 @@ var MethodInvoker = React.createClass({
       let successFn = (response) => {
         result = response;
         isLoading = !(isSuccess = true);
-        InspectorCache.storeResult(result);
+        let resultIdentifier = InspectorCache.storeResult(result);
         this.setState({
           isPromise,
           isSuccess,
           isLoading,
-          result: JSON.stringify(result, null, 4)
+          result: JSON.stringify(result, null, 4),
+          resultIdentifier
         });
       };
 
       let errorFn = (response) => {
         result = response;
         isLoading = false;
-        InspectorCache.storeResult(result);
+        let resultIdentifier = InspectorCache.storeResult(result);
         this.setState({
           isPromise,
           isSuccess,
           isLoading,
-          result: JSON.stringify(result, null, 4)
+          result: JSON.stringify(result, null, 4),
+          resultIdentifier
         });
       };
 
@@ -119,12 +121,13 @@ var MethodInvoker = React.createClass({
       }
     }
 
-    InspectorCache.storeResult(result);
+    let resultIdentifier = InspectorCache.storeResult(result);
     this.setState({
       isPromise,
       isSuccess,
       isLoading,
-      result: JSON.stringify(result, null, 4)
+      result: JSON.stringify(result, null, 4),
+      resultIdentifier
     });
   },
 
@@ -137,7 +140,7 @@ var MethodInvoker = React.createClass({
   },
 
   inspectResult: function inspectResult() {
-    this.transitionTo('app', { identifier: 'inspector->result' });
+    this.transitionTo('app', { identifier: `inspector->results->${this.state.resultIdentifier}` });
   },
 
   render: function() {
@@ -162,7 +165,7 @@ var MethodInvoker = React.createClass({
     }
 
     let inspectResult = <span className="action">(Nothing to inspect)</span>;
-    if (this.state.result) {
+    if (this.state.result && !this.state.isLoading) {
       inspectResult = <button className="action" onClick={this.inspectResult}>Inspect</button>;
     }
 

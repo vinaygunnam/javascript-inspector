@@ -44,28 +44,28 @@ function validateType(argumentText, argType, contextType, methodContext) {
       break;
     case 'Function':
       try {
-        var fnName = generateUniqueName();
+        let fName;
         if (argumentText && validateFnExpression(argumentText)) {
-          InspectorCache.storeCallback(fnName, eval(argumentText));
+          fName = InspectorCache.storeCallback(eval(argumentText));
         } else {
           text = 'function optional_name(/* arguments */) { /* body */ }';
-          InspectorCache.storeCallback(fnName, eval(text));
+          fName = InspectorCache.storeCallback(eval(text));
         }
 
         switch (contextType) {
           case 'method':
-            window.inspectorFns[fnName] = window.inspectorFns[fnName].bind(methodContext);
+            window.inspector.fns[fnName] = window.inspector.fns[fnName].bind(methodContext);
             break;
           case 'window':
-            window.inspectorFns[fnName] = window.inspectorFns[fnName].bind(window);
+            window.inspector.fns[fnName] = window.inspector.fns[fnName].bind(window);
             break;
           case 'null':
           default:
-            window.inspectorFns[fnName] = window.inspectorFns[fnName].bind(null);
+            window.inspector.fns[fnName] = window.inspector.fns[fnName].bind(null);
             break;
         }
 
-        value = window.inspectorFns[fnName];
+        value = window.inspector.fns[fnName];
         isValid = true;
       } catch (e) {
         isValid = false;
@@ -116,11 +116,6 @@ function validateFnExpression(fnExpr) {
   } else {
     return false;
   }
-}
-
-function generateUniqueName() {
-  var now = new Date();
-  return now.toString().replace(/[\s:\-\(\)]/gm, '');
 }
 
 module.exports = validateType;
