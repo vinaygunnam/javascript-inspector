@@ -68,7 +68,7 @@ var App = React.createClass({
 
           if (typeof object === 'function' && object.prototype
               && typeof object.prototype.constructor === 'function') {
-            inspectionPool.constructorFn = object.prototype.constructor;
+            inspectionPool.constructorFn = object;
           }
           error = null;
         } else {

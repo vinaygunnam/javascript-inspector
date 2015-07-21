@@ -53,9 +53,24 @@ var MethodInvoker = React.createClass({
     }
   },
 
+  invokeConstructor: function invokeConstructor(target, args) {
+    if (target) {
+      function F(args) {
+          return target.apply(this, args);
+      }
+      F.prototype = target.prototype;
+
+      return new F(args);
+    }
+    
+    //return new (Function.prototype.bind.apply(target, args));
+  },
+
   invokeMethod: function invokeMethod() {
     let args = this.state.arguments.map((arg) => arg.value);
-    let result = this.props.method.apply(this.props.context, args);
+    let result = this.props.isConstructor
+                  ? this.invokeConstructor(this.props.method, args)
+                  : this.props.method.apply(this.props.context, args);
     let isPromise = false,
         isSuccess = false,
         isLoading = false;
@@ -150,7 +165,7 @@ var MethodInvoker = React.createClass({
     if (this.state.result) {
       inspectResult = <button className="action" onClick={this.inspectResult}>Inspect</button>;
     }
-    
+
     return (
       <div>
         <p className="links"></p>

@@ -11,7 +11,10 @@ var Stage = React.createClass({
 
     if (identifier) {
       if (typeof object === 'function') {
-        output = <MethodInvoker title={identifier} method={object} context={context} />
+        let isConstructor = this.props.actor
+                              ? (this.props.actor.indexOf('constructorFn') > -1)
+                              : false;
+        output = <MethodInvoker title={identifier} method={object} context={context} isConstructor={isConstructor} />
       } else {
         output = <PropertyInfo title={identifier} property={object} />
       }

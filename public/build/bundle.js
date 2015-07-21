@@ -23670,7 +23670,7 @@
 	          }
 
 	          if (typeof object === 'function' && object.prototype && typeof object.prototype.constructor === 'function') {
-	            inspectionPool.constructorFn = object.prototype.constructor;
+	            inspectionPool.constructorFn = object;
 	          }
 	          error = null;
 	        } else {
@@ -24104,7 +24104,8 @@
 
 	    if (identifier) {
 	      if (typeof object === 'function') {
-	        output = React.createElement(_methodInvokerJsx2['default'], { title: identifier, method: object, context: context });
+	        var isConstructor = this.props.actor ? this.props.actor.indexOf('constructorFn') > -1 : false;
+	        output = React.createElement(_methodInvokerJsx2['default'], { title: identifier, method: object, context: context, isConstructor: isConstructor });
 	      } else {
 	        output = React.createElement(_propertyInfoJsx2['default'], { title: identifier, property: object });
 	      }
@@ -24202,13 +24203,27 @@
 	    }
 	  },
 
+	  invokeConstructor: function invokeConstructor(target, args) {
+	    if (target) {
+	      var F = function F(args) {
+	        return target.apply(this, args);
+	      };
+
+	      F.prototype = target.prototype;
+
+	      return new F(args);
+	    }
+
+	    //return new (Function.prototype.bind.apply(target, args));
+	  },
+
 	  invokeMethod: function invokeMethod() {
 	    var _this = this;
 
 	    var args = this.state.arguments.map(function (arg) {
 	      return arg.value;
 	    });
-	    var result = this.props.method.apply(this.props.context, args);
+	    var result = this.props.isConstructor ? this.invokeConstructor(this.props.method, args) : this.props.method.apply(this.props.context, args);
 	    var isPromise = false,
 	        isSuccess = false,
 	        isLoading = false;
