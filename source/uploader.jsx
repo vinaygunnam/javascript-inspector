@@ -15,7 +15,10 @@ var Uploader = React.createClass({
 
       reader.onload = (evt) => {
         try {
-          eval(reader.result);
+          var script = document.createElement('script');
+          script.innerHTML = reader.result;
+          document.body.appendChild(script);
+
           this.setState({
             error: null,
             ready: true

@@ -25163,7 +25163,10 @@
 
 	      reader.onload = function (evt) {
 	        try {
-	          eval(reader.result);
+	          var script = document.createElement('script');
+	          script.innerHTML = reader.result;
+	          document.body.appendChild(script);
+
 	          _this.setState({
 	            error: null,
 	            ready: true
